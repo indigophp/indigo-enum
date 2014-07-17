@@ -12,18 +12,14 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
-    },
-    "require-dev": {
-        "codeception/codeception": "~1.8.0"
+        "composer/installers": "~1.0"
     },
     "autoload": {
-        "psr-4": {
-            "Indigo\\Enum\\": "classes/"
-        }
+        "files": [
+            "autoload.php"
+        ]
     },
     "extra": {
-        "installer-name": "skeleton"
-    },
-    "minimum-stability": "dev"
+        "installer-name": "enum"
+    }
 }

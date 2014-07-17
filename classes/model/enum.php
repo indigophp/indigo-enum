@@ -24,7 +24,7 @@ class Model_Enum extends Model
 
 	protected static $_has_many = array(
 		'items' => array(
-			'model_to' => 'Indigo\\Base\\Model\\Enum\\ItemModel',
+			'model_to' => 'Model_Enum_Item',
 			'key_to'   => 'enum_id',
 		),
 	);
@@ -33,7 +33,7 @@ class Model_Enum extends Model
 		'default' => array(
 			'key_from' => array('id', 'default_id'),
 			'key_to'   => array('enum_id', 'item_id'),
-			'model_to' => 'Indigo\\Base\\Model\\Enum\\ItemModel',
+			'model_to' => 'Model_Enum_Item',
 		),
 	);
 
@@ -107,18 +107,6 @@ class Model_Enum extends Model
 
 	public static function _init()
 	{
-		// static::$_properties = \Arr::merge(static::$_properties, array(
-		// 	'default_id' => array(
-		// 		'form' => array(
-		// 			'options' => function($model) {
-		// 				$model->items;
-		// 				$model = $model->to_array();
-		// 				return \Arr::pluck($model['items'], 'name', 'id');
-		// 			}
-		// 		)
-		// 	),
-		// ));
-
 		if (\Auth::has_access('enum.enum[all]'))
 		{
 			\Arr::set(static::$_properties, 'read_only.form', array(
