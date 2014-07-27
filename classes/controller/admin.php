@@ -18,27 +18,36 @@ namespace Enum;
  */
 class Controller_Admin extends \Admin\Controller_Admin_Skeleton
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	protected $module = 'enum';
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected $model = 'Model_Enum';
 
-	protected $name = array(
+	/**
+	 * {@inheritdoc}
+	 */
+	protected $name = [
 		'enum',
 		'enums',
-	);
+	];
 
 	/**
-	 * {@inheritdocs}
+	 * {@inheritdoc}
 	 */
 	public function has_access($access)
 	{
-		return parent::has_access('enum[' . $access . ']');
+		return parent::has_access('enum.enum[' . $access . ']');
 	}
 
 	/**
-	 * {@inheritdocs}
+	 * {@inheritdoc}
 	 */
-	public function query($options = array())
+	public function query($options = [])
 	{
 		$query = parent::query()
 			->related('default');
@@ -49,7 +58,7 @@ class Controller_Admin extends \Admin\Controller_Admin_Skeleton
 				->order_by('items.sort');
 		}
 
-		if ( ! $this->has_access('all'))
+		if ($this->has_access('all') === false)
 		{
 			$query->where('read_only', 0);
 		}
@@ -57,7 +66,10 @@ class Controller_Admin extends \Admin\Controller_Admin_Skeleton
 		return $query;
 	}
 
-	public function view($view, $data = array(), $auto_filter = null)
+	/**
+	 * {@inheritdoc}
+	 */
+	public function view($view, $data = [], $auto_filter = null)
 	{
 		switch ($this->request->action)
 		{
@@ -69,14 +81,5 @@ class Controller_Admin extends \Admin\Controller_Admin_Skeleton
 		}
 
 		return parent::view($view, $data, $auto_filter);
-	}
-
-	protected function map(\Orm\Model $model, array $properties)
-	{
-		$data = parent::map($model, $properties);
-
-		empty($data['default.name']) and $data['default.name'] = gettext('<i>None</i>');
-
-		return $data;
 	}
 }
