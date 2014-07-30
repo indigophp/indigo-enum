@@ -12,7 +12,7 @@
 namespace Enum;
 
 /**
- * Enum admin class
+ * Enum admin controller
  *
  * @author Márk Sági-Kazár <mark.sagikazar@gmail.com>
  */
@@ -71,12 +71,10 @@ class Controller_Admin extends \Admin\Controller_Admin_Skeleton
 	 */
 	public function view($view, $data = [], $auto_filter = null)
 	{
-		switch ($this->request->action)
+		switch ($view)
 		{
-			case 'view':
+			case 'admin/skeleton/view':
 				$view = 'admin/enum/view';
-				break;
-			default:
 				break;
 		}
 

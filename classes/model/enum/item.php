@@ -11,6 +11,7 @@
 
 namespace Enum;
 
+use Fuel\Orm\SortableInterface;
 use Orm\Model;
 
 /**
@@ -18,106 +19,131 @@ use Orm\Model;
  *
  * @author Márk Sági-Kazár <mark.sagikazar@gmail.com>
  */
-class Model_Enum_Item extends Model
+class Model_Enum_Item extends Model implements SortableInterface
 {
-	use \Indigo\Base\Model\SkeletonTrait;
+	use \Indigo\Skeleton\Model;
 
-	protected static $_enum;
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_belongs_to = ['enum'];
 
-	protected static $_belongs_to = array('enum');
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_eav = ['meta'];
 
-	protected static $_eav = array(
-		'meta' => array(
-			'attribute' => 'key',
-			'value'     => 'value',
-		)
-	);
-
-	protected static $_has_many = array(
-		'meta' => array(
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_has_many = [
+		'meta' => [
 			'model_to'       => 'Model_Enum_Meta',
 			'key_to'         => 'item_id',
 			'cascade_delete' => true,
-		),
-	);
+		],
+	];
 
-	protected static $_observers = array(
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_observers = [
 		'Orm\\Observer_Typing',
-		'Orm\\Observer_Self' => array(
-			'events' => array('before_insert', 'before_update')
-		)
-	);
+		'Orm\\Observer_Self' => [
+			'events' => ['before_insert', 'before_update'],
+		],
+		'Fuel\\Orm\\Observer\\Sort',
+	];
 
-	protected static $_properties = array(
-		'id' => array(),
-		'item_id' => array(),
-		'enum_id' => array('data_type' => 'int'),
-		'name' => array(
-			'form' => array('type' => 'text'),
-			'validation' => 'required|trim',
-		),
-		'slug' => array(),
-		'description' => array(
-			'form' => array('type' => 'textarea'),
-		),
-		'active' => array(
-			'default'   => 1,
-			'data_type' => 'int',
-			'min'       => 0,
-			'max'       => 1,
-			'form'      => array(
-				'type' => 'switch'
-			),
-		),
-		'sort' => array('data_type' => 'int'),
-	);
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_properties = [
+		'id' => [
+			'label'     => 'ID',
+			'data_type' => 'integer',
+		],
+		'item_id' => [
+			'label'     => 'Item ID',
+			'data_type' => 'integer',
+		],
+		'enum_id' => [
+			'label'     => 'Enum ID',
+			'data_type' => 'integer',
+		],
+		'name' => [
+			'label'      => 'Name',
+			'validation' => ['required'],
+		],
+		'slug' => [
+			'label' => 'Slug',
+		],
+		'description' => [
+			'label' => 'Description',
+		],
+		'active' => [
+			'label'      => 'Active',
+			'default'    => 1,
+			'data_type'  => 'integer',
+			'options'    => ['No', 'Yes'],
+			'validation' => ['value' => [0, 1]],
+		],
+		'sort' => [
+			'label'     => 'Sort',
+			'data_type' => 'integer',
+		],
+	];
 
-	protected static $_sort = true;
+	/**
+	 * Skeleton properties
+	 *
+	 * @var []
+	 */
+	protected static $skeleton = [
+		'lists' => [
+			'id' => [
+				'label' => '#',
+				'type'  => 'text',
+			],
+			'name',
+			'active' => [
+				'type' => 'select',
+			],
+		],
+		'form' => [
+			'name',
+			'description' => [
+				'type' => 'textarea',
+			],
+			'active' => [
+				'type'     => 'checkbox',
+				'template' => 'switch',
+			],
+		],
+		'view' => [
+			'id',
+			'name',
+			'description',
+			'active',
+		],
+	];
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected static $_table_name = 'enum_items';
 
-	protected static $_primary_key = array('id');
-
-	public static function _init()
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getSortMax()
 	{
-		static::$_properties = \Arr::merge(static::$_properties, array(
-			'id' => array(
-				'label' => gettext('ID')
-			),
-			'item_id' => array(
-				'label' => gettext('Item ID')
-			),
-			'enum_id' => array(
-				'label' => gettext('Enum ID')
-			),
-			'name' => array(
-				'label' => gettext('Name'),
-			),
-			'slug' => array(
-				'label' => gettext('Slug'),
-			),
-			'description' => array(
-				'label' => gettext('Description'),
-			),
-			'active' => array(
-				'label' => gettext('Active'),
-				'form' => array(
-					'options' => array(
-						0 => gettext('No'),
-						1 => gettext('Yes'),
-					),
-				),
-			),
-			'sort' => array(
-				'label' => gettext('Sort'),
-			),
-		));
+		return $this->query()->where('enum_id', $this->enum_id)->max('sort');
 	}
 
 	public function _event_before_insert()
 	{
 		$this->item_id = $this->query()->where('enum_id', $this->enum_id)->max('item_id') + 1;
-		static::$_sort === true and $this->sort = $this->query()->where('enum_id', $this->enum_id)->max('sort') + 10;
 		$this->slug = $this->_get_slug();
 	}
 
@@ -139,7 +165,7 @@ class Model_Enum_Item extends Model
 			->get();
 
 		// make sure our slug is unique
-		if ( ! empty($same))
+		if (empty($same) === false)
 		{
 			$max = -1;
 

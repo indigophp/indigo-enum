@@ -1,11 +1,34 @@
 <?php
 
+/*
+ * This file is part of the Indigo Enum module.
+ *
+ * (c) Indigo Development Team
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Enum;
 
+/**
+ * Enum item admin controller
+ *
+ * @author Márk Sági-Kazár <mark.sagikazar@gmail.com>
+ */
 class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	protected $module = 'enum_item';
+
+	/**
+	 * {@inheritdoc}
+	 */
 	protected $model = 'Model_Enum_Item';
+
+
 	protected $_enum;
 
 	protected $name = array(
@@ -14,19 +37,22 @@ class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 	);
 
 	/**
-	 * {@inheritdocs}
+	 * {@inheritdoc}
 	 */
 	public function has_access($access)
 	{
 		return \Auth::has_access('enum.item[' . $access . ']');
 	}
 
-	public function query($options = array())
+	/**
+	 * {@inheritdoc}
+	 */
+	public function query($options = [])
 	{
 		$query = parent::query()
 			->related('enum');
 
-		if ( ! \Auth::has_access('enum.enum[all]'))
+		if (\Auth::has_access('enum.enum[all]') === false)
 		{
 			$query->where('enum.read_only', 0);
 		}
@@ -45,7 +71,7 @@ class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 
 	protected function enum($id = null)
 	{
-		if ($id instanceof \Model_Enum)
+		if ($id instanceof Model_Enum)
 		{
 			return $this->_enum = $id;
 		}
@@ -61,7 +87,7 @@ class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 			$query->where('slug', $id);
 		}
 
-		if ( ! \Auth::has_access('enum.enum[all]'))
+		if (\Auth::has_access('enum.enum[all]') === false)
 		{
 			$query->where('read_only', 0);
 		}
@@ -74,16 +100,6 @@ class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 		return $this->_enum = $model;
 	}
 
-	protected function url()
-	{
-		if ( ! empty($this->_url) and empty($this->_enum))
-		{
-			return $this->_url;
-		}
-
-		return $this->_url = \Uri::admin() . 'enum/' . (isset($this->_enum) ? 'view/' . $this->_enum->id : '');
-	}
-
 	protected function forge($data = array(), $new = true, $view = null, $cache = true)
 	{
 		$model = parent::forge($data, $new, $view, $cache);
@@ -94,13 +110,13 @@ class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 
 	public function action_index()
 	{
-		return $this->redirect($this->url());
+		// return $this->redirect($this->url());
 	}
 
 	public function action_view($id = null)
 	{
 		$model = $this->find($id);
-		return $this->redirect($this->url());
+		// return $this->redirect($this->url());
 	}
 
 	public function action_create($enum = null)
@@ -108,13 +124,6 @@ class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 		$this->enum($enum);
 
 		return parent::action_create();
-	}
-
-	public function post_create($enum = null)
-	{
-		$this->enum($enum);
-
-		return parent::post_create();
 	}
 
 	public function action_reorder()

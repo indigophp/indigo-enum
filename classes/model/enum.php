@@ -20,145 +20,225 @@ use Orm\Model;
  */
 class Model_Enum extends Model
 {
-	use \Indigo\Base\Model\SkeletonTrait;
+	use \Indigo\Skeleton\Model;
 
-	protected static $_has_many = array(
-		'items' => array(
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_has_many = [
+		'items' => [
 			'model_to' => 'Model_Enum_Item',
 			'key_to'   => 'enum_id',
-		),
-	);
+		],
+	];
 
-	protected static $_has_one = array(
-		'default' => array(
-			'key_from' => array('id', 'default_id'),
-			'key_to'   => array('enum_id', 'item_id'),
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_has_one = [
+		'default' => [
+			'key_from' => ['id', 'default_id'],
+			'key_to'   => ['enum_id', 'item_id'],
 			'model_to' => 'Model_Enum_Item',
-		),
-	);
+		],
+	];
 
-	protected static $_observers = array(
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_observers = [
 		'Orm\\Observer_Typing',
-		'Orm\\Observer_Self' => array(
-			'events' => array('before_insert')
-		),
-		'Orm\\Observer_Slug' => array(
-			'events'    => array('before_insert'),
+		'Orm\\Observer_Self' => [
+			'events' => ['before_insert'],
+		],
+		'Orm\\Observer_Slug' => [
+			'events'    => ['before_insert'],
 			'source'    => 'name',
 			'separator' => '_',
 			'overwrite' => false,
-		),
-	);
+		],
+	];
 
-	protected static $_properties = array(
-		'id' => array(
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static $_properties = [
+		'id' => [
 			'label' => 'ID',
-			'view' => false,
-		),
-		'name' => array(
-			'label' => 'Name',
-			'form' => array('type' => 'text'),
-			'list' => array('type' => 'text'),
-			'validation' => array('required'),
-		),
-		'slug' => array('label' => 'Slug'),
-		'description' => array(
+		],
+		'name' => [
+			'label'      => 'Name',
+			'type'       => 'text',
+			'validation' => ['required'],
+		],
+		'slug' => [
+			'label' => 'Slug',
+		],
+		'description' => [
 			'label' => 'Description',
-			'form' => array('type' => 'textarea'),
-		),
-		'default_id' => array(
-			'label' => 'Default',
+			'type'  => 'textarea',
+		],
+		'default_id' => [
+			'label'     => 'Default',
 			'default'   => 1,
 			'data_type' => 'int',
-			'view' => false,
-			'form' => array('type' => 'select'),
-		),
-		'default.name' => array(
-			'label' => 'Default',
-			'list' => array('type' => 'text'),
-		),
-		'active' => array(
+		],
+		'active' => [
 			'label'     => 'Active',
 			'default'   => 1,
 			'data_type' => 'int',
-			'min'       => 0,
-			'max'       => 1,
-			'form'      => array(
-				'type'     => 'checkbox',
-				'template' => 'switch',
-				'options'  => array('No', 'Yes'),
-			),
-			'list'      => array('type' => 'select'),
-		),
-		'read_only' => array(
+			'options'  => ['No', 'Yes'],
+			'validation' => ['value' => [0, 1]],
+		],
+		'read_only' => [
 			'label'     => 'Read-only',
 			'default'   => 0,
 			'data_type' => 'int',
-			'min'       => 0,
-			'max'       => 1,
-			'list' => array(
-				'type'    => 'select',
-				'default' => 0
-			),
-		),
-	);
+			'options'   => ['No', 'Yes'],
+			'validation' => ['value' => [0, 1]],
+		],
+	];
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected static $_table_name = 'enums';
+
+	/**
+	 * List skeleton properties
+	 *
+	 * @var []
+	 */
+	protected static $_list_properties = [
+		'id' => [
+			'label' => '#',
+			'type'  => 'text',
+		],
+		'name',
+		'active' => [
+			'type' => 'select',
+		],
+		'read_only' => [
+			'type' => 'select',
+		],
+	];
+
+	/**
+	 * Form skeleton properties
+	 *
+	 * @var []
+	 */
+	protected static $_form_properties = [
+		'name',
+		'description',
+		'default_id' => [
+			'type' => 'select',
+		],
+		'active' => [
+			'type'     => 'checkbox',
+			'template' => 'switch',
+		],
+		'read_only' => [
+			'type'     => 'checkbox',
+			'template' => 'switch',
+		],
+	];
+
+	/**
+	 * View skeleton properties
+	 *
+	 * @var []
+	 */
+	protected static $_view_properties = [
+		'id',
+		'name',
+		'description',
+		'active',
+		'read_only',
+	];
 
 	public static function _init()
 	{
-		if (\Auth::has_access('enum.enum[all]'))
+		if (\Auth::has_access('enum.enum[all]') === false)
 		{
-			\Arr::set(static::$_properties, 'read_only.form', array(
-					'type' => 'checkbox',
-					'template' => 'switch',
-					'options' => array(
-						gettext('No'),
-						gettext('Yes'),
-					),
-			));
+			unset(static::$_form_properties['read_only']);
 		}
 	}
 
-	public function add_item($data = array(), $default = false, $save = true)
+	/**
+	 * Adds an item to the enum and optionally saves it
+	 *
+	 * @param Model_Enum_Item $model
+	 * @param boolean         $default
+	 * @param boolean         $save
+	 *
+	 * @return this
+	 */
+	public function add_item(Model_Enum_Item $model, $default = false, $save = true)
 	{
-		if (\Arr::is_multi($data))
+		$this->items[] = $model;
+
+		if ($default === true)
 		{
-			foreach ($data as $default => $item)
-			{
-				$this->add_item($item, $default === 'default', false);
-			}
-		}
-		else
-		{
-			$model = \Model_Enum_Item::forge();
-			$model->set($data);
-			$this->items[] = $model;
-			$default === true and $this->default = $model;
+			$this->default = $model;
 		}
 
 		$save === true and $this->save(true);
+
+		return $this;
 	}
 
-	public static function get_enum_options($enum)
+	/**
+	 * Adds several items to the enum
+	 *
+	 * @param []      $models
+	 * @param boolean $save
+	 *
+	 * @return this
+	 */
+	public function add_items(array $models = [], $save = true)
 	{
-		$options = static::query()
-			->related('default')
-			->related('items')
-			->related('items.meta')
-			->where('slug', $enum)
-			->get_one();
-
-		if (is_null($options))
+		foreach ($models as $default => $item)
 		{
-			$options = array();
+			$this->add_item($item, $default === 'default', false);
+		}
+
+		$save === true and $this->save(true);
+
+		return $this;
+	}
+
+	/**
+	 * Returns items for an enum
+	 *
+	 * @param string|integer $enum
+	 *
+	 * @return []
+	 */
+	public static function get_enum_items($enum)
+	{
+		$enum = static::query()
+			->related('items')
+			->order_by('items.sort');
+
+		if (is_int($enum))
+		{
+			$enum->where('id', $enum);
 		}
 		else
 		{
-			$options = $options->to_array();
-			$options = \Arr::pluck($options['items'], 'name', 'item_id');
+			$enum->where('slug', $enum);
 		}
 
-		return $options;
+		$enum = $enum->get_one();
+
+		if (is_null($enum))
+		{
+			return [];
+		}
+
+		$enum = $enum->to_array();
+
+		return \Arr::pluck($enum['items'], 'name', 'item_id');
 	}
 }

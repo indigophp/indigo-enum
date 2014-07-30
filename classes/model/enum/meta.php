@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Indigo Base package.
+ * This file is part of the Indigo Enum module.
  *
  * (c) Indigo Development Team
  *
@@ -20,6 +20,9 @@ use Orm\Model;
  */
 class Model_Enum_Meta extends Model
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	protected static $_belongs_to = array(
 		'item' => array(
 			'key_from' => 'item_id',
@@ -27,12 +30,18 @@ class Model_Enum_Meta extends Model
 		)
 	);
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected static $_properties = array(
 		'id',
 		'item_id',
-		'key',
+		'attribute',
 		'value',
 	);
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected static $_table_name = 'enum_meta';
 }
