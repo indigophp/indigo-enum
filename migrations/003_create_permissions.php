@@ -18,7 +18,7 @@ namespace Fuel\Migrations;
  *
  * @author Márk Sági-Kazár <mark.sagikazar@gmail.com>
  */
-class Create_permissions extends \Admin\Migration_Permission
+class Create_permissions extends \Auth\Migration_Permission
 {
 	/**
 	 * {@inheritdoc}

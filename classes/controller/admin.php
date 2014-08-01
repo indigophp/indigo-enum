@@ -16,7 +16,7 @@ namespace Enum;
  *
  * @author Márk Sági-Kazár <mark.sagikazar@gmail.com>
  */
-class Controller_Admin extends \Admin\Controller_Admin_Skeleton
+class Controller_Admin extends \Admin\Controller_Skeleton
 {
 	/**
 	 * {@inheritdoc}

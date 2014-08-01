@@ -95,38 +95,43 @@ class Model_Enum_Item extends Model implements SortableInterface
 	];
 
 	/**
-	 * Skeleton properties
+	 * List skeleton properties
 	 *
 	 * @var []
 	 */
-	protected static $skeleton = [
-		'lists' => [
-			'id' => [
-				'label' => '#',
-				'type'  => 'text',
-			],
-			'name',
-			'active' => [
-				'type' => 'select',
-			],
+	protected static $_list_properties = [
+		'id' => [
+			'label' => '#',
+			'type'  => 'text',
 		],
-		'form' => [
-			'name',
-			'description' => [
-				'type' => 'textarea',
-			],
-			'active' => [
-				'type'     => 'checkbox',
-				'template' => 'switch',
-			],
-		],
-		'view' => [
-			'id',
-			'name',
-			'description',
-			'active',
+		'name',
+		'active' => [
+			'type' => 'select',
 		],
 	];
+
+	/**
+	 * Form skeleton properties
+	 *
+	 * @var []
+	 */
+	protected static $_form_properties = [
+		'name',
+		'description' => [
+			'type' => 'textarea',
+		],
+		'active' => [
+			'type'     => 'checkbox',
+			'template' => 'switch',
+		],
+	];
+
+	/**
+	 * View skeleton properties
+	 *
+	 * @var []
+	 */
+	protected static $_view_properties = [];
 
 	/**
 	 * {@inheritdoc}

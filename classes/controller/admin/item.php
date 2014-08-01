@@ -16,7 +16,7 @@ namespace Enum;
  *
  * @author Márk Sági-Kazár <mark.sagikazar@gmail.com>
  */
-class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
+class Controller_Admin_Item extends \Admin\Controller_Skeleton
 {
 	/**
 	 * {@inheritdoc}
@@ -116,7 +116,7 @@ class Controller_Admin_Item extends \Admin\Controller_Admin_Skeleton
 	public function action_view($id = null)
 	{
 		$model = $this->find($id);
-		// return $this->redirect($this->url());
+		return $this->redirect($this->get_url());
 	}
 
 	public function action_create($enum = null)
